@@ -6,7 +6,6 @@ use App\Interfaces\RssFeedServiceInterface;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
-
 class RssFeedController extends Controller
 {
     protected RssFeedServiceInterface $rssFeedService;
