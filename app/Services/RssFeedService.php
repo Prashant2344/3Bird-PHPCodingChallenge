@@ -31,15 +31,18 @@ class RssFeedService implements RssFeedServiceInterface
 
             if ($response->failed()) {
                 Log::error("Guardian API error", ['section' => $section, 'response' => $response->body()]);
-                abort(500, 'Failed to fetch data from The Guardian.');
+                throw new \Symfony\Component\HttpKernel\Exception\HttpException(500, 'Failed to fetch data from The Guardian.');
             }
 
             $articles = $response->json()['response']['results'] ?? [];
 
             return $this->generateRssFeed($section, $articles);
         } catch (\Exception $e) {
+            // Log the error once before throwing the exception again
             Log::error('Error: ' . $e->getMessage());
-            return 'Error: ' . $e->getMessage();
+
+            // Rethrow the exception so the test can catch it
+            throw $e;
         }
     }
 
