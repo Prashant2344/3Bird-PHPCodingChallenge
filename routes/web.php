@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\RssFeedController;
+use App\Http\Middleware\ValidateSectionMiddleware;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -19,4 +20,4 @@ Route::get('/', function () {
 });
 
 Route::get('/sections/{section}', [RssFeedController::class, 'getFeed'])
-    ->where('section', '[a-z\-]+');
+    ->middleware(ValidateSectionMiddleware::class);
