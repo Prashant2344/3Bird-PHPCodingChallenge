@@ -17,6 +17,8 @@
 
 # Following are the task details
 
+# some of the valid sections are sport, lifeandstyle
+
 # Added ValidateSectionMiddleware to ensure section names are in lowercase letters and hyphens, returning a 400 error for invalid formats 
 
 # Added generateRssFeed functional in RssFeedService to ensure HTTPS requests to the remote API are in JSON format, with XML conversion handled on the server application.
