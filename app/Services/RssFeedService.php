@@ -43,6 +43,16 @@ class RssFeedService implements RssFeedServiceInterface
                 'headers' => ['Accept' => 'application/json'],
             ]);
 
+            if ($response->unauthorized()) {
+                Log::error("Invalid API Key", ['section' => $section, 'response' => $response->body()]);
+                return response()->json(['error' => 'Invalid API key.'], 401);
+            }
+
+            if ($response->forbidden()) {
+                Log::error("Access denied", ['section' => $section, 'response' => $response->body()]);
+                return response()->json(['error' => 'Access denied. Check API key permissions.'], 403);
+            }
+
             if ($response->failed()) {
                 Log::error("Guardian API error", ['section' => $section, 'response' => $response->body()]);
                 throw new \Symfony\Component\HttpKernel\Exception\HttpException(500, 'Failed to fetch data from The Guardian.');
