@@ -23,7 +23,21 @@ class RssFeedService implements RssFeedServiceInterface
 
     public function getArticles(string $section): string
     {
+        $cacheKey = 'rss_feed_' . $section;
+        $cacheTime = now()->addMinutes(10);
+
+        // Check if the cache already exists
+        $rssFeed = Cache::get($cacheKey);
+
+        if ($rssFeed) {
+            Log::info('Fetching RSS feed from Cache for section: ' . $section);
+            return response($rssFeed, 200, ['Content-Type' => 'application/rss+xml']);
+        }
+
         try {
+            // If not in cache, fetch the data from API
+            Log::info('Fetching RSS feed from API for section: ' . $section);
+
             $response = Http::get("{$this->apiUrl}{$section}", [
                 'api-key' => $this->apiKey,
                 'headers' => ['Accept' => 'application/json'],
@@ -36,7 +50,10 @@ class RssFeedService implements RssFeedServiceInterface
 
             $articles = $response->json()['response']['results'] ?? [];
 
-            return $this->generateRssFeed($section, $articles);
+            $rssFeed = $this->generateRssFeed($section, $articles);
+
+            // Cache the result if fetching from API is successful
+            Cache::put($cacheKey, $rssFeed, $cacheTime);
         } catch (\Exception $e) {
             // Log the error once before throwing the exception again
             Log::error('Error: ' . $e->getMessage());
@@ -44,6 +61,8 @@ class RssFeedService implements RssFeedServiceInterface
             // Rethrow the exception so the test can catch it
             throw $e;
         }
+        
+        return response($rssFeed, 200, ['Content-Type' => 'application/rss+xml']);
     }
 
     private function generateRssFeed(string $section, array $articles): string

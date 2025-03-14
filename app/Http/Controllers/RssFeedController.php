@@ -16,7 +16,7 @@ class RssFeedController extends Controller
         $this->rssFeedService = $rssFeedService;
     }
 
-    public function getFeed(Request $request, string $section): Response
+    public function getFeed(string $section): Response
     {
         return response($this->rssFeedService->getArticles($section), 200)
             ->header('Content-Type', 'application/rss+xml');
